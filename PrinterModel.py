@@ -1,10 +1,9 @@
-from sympy import *
 import time
 import datetime
 import random
 import math
 
-class Printer:
+class PrinterModel:
 	#for calculating the kinematics	
 	#the tower orders are alpha, beta, gamma
 
@@ -32,10 +31,6 @@ class Printer:
 		[towerHeight,towerHeight,towerHeight]				#upper z
 	]
 
-	x = Symbol("x")
-	y = Symbol("y")
-	z = Symbol("z")
-
 	def getParameters(self):
 		return self.travelDist
 
@@ -56,28 +51,18 @@ class Printer:
 		self.travelDist[1] = 1
 		return self.travelDist
 
-	def updateCarriagePosition(self):
-		#travelDist is the distance the carriage hasgone down the tower, from the endstop at the top.
+
+	def getEffectorPosition(self):
+		#see notebook for better explanation.
+		#datastructures needed: arms, carriagePos
+
 		for i in range (3):
-			towerLength = sqrt( (self.towerVertices[0][i]-self.towerVertices[3][i])**2 + (self.towerVertices[1][i]-self.towerVertices[4][i])**2 + (self.towerVertices[2][i]-self.towerVertices[5][i])**2)
+			towerLength = math.sqrt( (self.towerVertices[0][i]-self.towerVertices[3][i])**2 + (self.towerVertices[1][i]-self.towerVertices[4][i])**2 + (self.towerVertices[2][i]-self.towerVertices[5][i])**2)
 
 			for j in range (3):
 				#do similar triangles for each of the three axies
 				self.carriagePos[j][i] =  self.towerVertices[i][j] - ((self.towerVertices[i][j]-self.towerVertices[i+3][j]) * (towerLength-self.travelDist[j]) / towerLength)
 
-		return self.carriagePos
-
-	def getEffectorPositionNumeric(self):
-		"""numberically solve the problem. may be slower?"""
-		eqn = [0,0,0]
-
-		for i in range (3):
-			eqn[i] = (self.x-self.carriagePos[0][i])**2+(self.y-self.carriagePos[1][i])**2+(self.z-self.carriagePos[2][i])**2-(self.arms[i])**2
-		eqns = [eqn[0], eqn[1],eqn[2]]
-		return nsolve(eqns, [self.x,self.y,self.z],[0,0,-1])
-
-	def getEffectorPosition(self):
-		#see notebook for better explanation.
 
 		l12, l12mag, l121, l121mag = getPerp(self.arms[0], self.arms[1], self.carriagePos[0][:], self.carriagePos[1][:])
 		l23, l23mag, l232, l232mag = getPerp(self.arms[1], self.arms[2], self.carriagePos[1][:], self.carriagePos[2][:])
@@ -180,7 +165,7 @@ def line(p0, p1):
 	for i in range(3):
 		l.append(p1[i]-p0[i])
 		lmag += l[i]**2
-	lmag = sqrt(lmag)
+	lmag = math.sqrt(lmag)
 
 	return l, lmag
 
@@ -254,34 +239,6 @@ def distAlongLine(l, h):
 	l[2] = l[2]/l[0]
 	l[0] = 1
 
-	t = sqrt( (h**2)/(l[1]**2 + l[2]**2 + 1) )
+	t = math.sqrt( (h**2)/(l[1]**2 + l[2]**2 + 1) )
 
 	return [t, l[1]*t, l[2]*t]
-
-
-printer = Printer()
-
-print printer.updateCarriagePosition()
-print printer.getEffectorPositionNumeric()
-
-start = time.clock()
-for i in range(10):
-	printer.updateCarriagePosition()
-	printer.getEffectorPositionNumeric()
-	#printer.getEffectorPosition()
-end = time.clock()
-timeNumeric = (end-start)/10 *1000
-
-start = time.clock()
-for i in range(100):
-	printer.updateCarriagePosition()
-	printer.getEffectorPosition()
-end = time.clock()
-timeCalc = (end-start)/100 *1000
-print "time(ms): ", timeCalc, "Improvement(%): ", timeNumeric/timeCalc *100
-
-
-print printer.getEffectorPosition()
-printer.exportVars()
-
-
