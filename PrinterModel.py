@@ -56,6 +56,7 @@ class PrinterModel:
 		#see notebook for better explanation.
 		#datastructures needed: arms, carriagePos
 
+		#update the carriage positions
 		for i in range (3):
 			towerLength = math.sqrt( (self.towerVertices[0][i]-self.towerVertices[3][i])**2 + (self.towerVertices[1][i]-self.towerVertices[4][i])**2 + (self.towerVertices[2][i]-self.towerVertices[5][i])**2)
 
@@ -67,34 +68,18 @@ class PrinterModel:
 		l12, l12mag, l121, l121mag = getPerp(self.arms[0], self.arms[1], self.carriagePos[0][:], self.carriagePos[1][:])
 		l23, l23mag, l232, l232mag = getPerp(self.arms[1], self.arms[2], self.carriagePos[1][:], self.carriagePos[2][:])
 
-		#print l12
-		#print l12mag
-		#print l121mag
-		#print "l121: ", l121
-
 		p0 = self.carriagePos[0][:]
 		p1 = self.carriagePos[1][:]
 		p2 = self.carriagePos[2][:]
 
-		#get the plane of the 3carrige points.
-		#print "line p0 p1:", line(p0, p1)[0]
-		#print "line p1 p2:", line(p1, p2)[0]
-
-		#print "p0:", p0
-		#print "p1:", p1
-		#print "p2:", p2
 		p012 = getPlane(line(p0, p1)[0], line(p1, p2)[0], p2)
 
-		#print "p012: ", p012
-
-		#get the plane of each perpendicular plane
-		
+		#get the plane of each perpendicular plane	
 		p12 = planeFromLinePoint(l12, l121)	#normal, calculate d ***need to make sure normal is correct***
 		p23 = planeFromLinePoint(l23, l232)
 
 		pCenter = intersection3Planes(p12,p23,p012)
-		#print "pCenter:", pCenter
-
+		
 		offset = distAlongLine(p012[0:3], 64.387)
 		#intersection of 3 planes
 
