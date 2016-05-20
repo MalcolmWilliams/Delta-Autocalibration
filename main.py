@@ -73,27 +73,38 @@ def updateCosts():
 
 def crossover(parameters1, parameters2):
 	#average a random parameter and append the new thing to the population array.
+
+	for i in range(2):
+		indiv = individual()
+		randomInt = random.randint(0,len(parameters1))
+		parameters = parameters1	#once this is verified as workign this should be changed to make the second child based off the first parameter set
+		parameters[randomInt] = (parameters1[randomInt] + parameters2[randomInt] ) /2
+		indiv.setParameters(parameters)
+		population.append(indiv)
 	
 
-def geneticSelection():
+def geneticSelection(selectionThreshold, rejectionThreshold):
 	readyForCrossover = False
 	crossoverParams = []
 	normalCost = 0
-	for i in range(10000):
+	for i in range(100):
 		maxCost = updateCosts()
-		for i in range(len(population)):
-			normalCost = population[i].getCost()/maxCost	#sets the normalised cost of the parameters, smaller is better, between 0 and 1
+		for indiv in list(population):	#iterate over a copy of the original population, so we can modify the original
+			normalCost = indiv.getCost()/maxCost	#sets the normalised cost of the parameters, smaller is better, between 0 and 1
 
 			#do the genetic stuff
 			if (normalCost < selectionThreshold):
 				if (readyForCrossover):
 					#do crossover stuff
-					crossover(population[i].getParamters(), crossoverParams)
+					crossover(indiv.getParamters(), crossoverParams)	#should add two new individuals to keep population size constant
 					readyForCrossover = False
 				else:
 					readyForCrossover = True
 					crossoverIdx = i
+
 			else if (normalCost > rejectionThreshold):
+				population.remove(indiv)	#not sure if this is legit
+
 				#destroy the individual
 			#the ones between the two thresholds dont get destroyed, but also dont get to reproduce
 
