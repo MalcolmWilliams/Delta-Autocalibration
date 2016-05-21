@@ -39,7 +39,7 @@ class individual:
 	def setCost(self, newCost):
 		self.cost = newCost
 
-	def getparameters(self):
+	def getParameters(self):
 		return self.parameters
 
 	def getEffectorPos(self):
@@ -56,41 +56,45 @@ def calculateCost(testPos, targetPos):
 		cost += (testPos[i] - targetPos[i])**2
 	#print cost
 	#print testPos, targetPos
-	return math.sqrt(cost)
+	return cost
 
-def updateCosts(targetEffectorPos):
-	maxCost = 0.0001
-	print"costs"
+def updateCosts(population, targetEffectorPos):
+	#maxCost = 0
+	#print"costs"
 	for i in range(len(population)):
 		#calculates a new effector position and then the resulting cost.
-		printer.setParameters(population[i].getparameters())
-		#print population[i].getparameters()
+		printer.setParameters(population[i].getParameters())
+		#print population[i].getParameters()
 		#print "printer effector position:", printer.getEffectorPosition()
 		population[i].setEffectorPos(printer.getEffectorPosition())
 		cost = calculateCost(population[i].getEffectorPos(), targetEffectorPos)
 		population[i].setCost(cost)
 
-		if (maxCost < cost):
-			maxCost = cost
+		#if (maxCost < cost):
+		#	maxCost = cost
 		#print cost
-		print cost
+		#print cost
 
-	print "maxCost\n", maxCost
-	return maxCost
+	#print "maxCost\n", maxCost
+	#return maxCost
 
 def crossover(newPopulation, parameters1, parameters2):
 	#average a random parameter and append the new thing to the population array.
 	#for i in range(2):
 	indiv = individual()
-	randomInt = random.randint(0,len(parameters1)-1)
+	#randomInt = random.randint(0,len(parameters1)-1)
 	#print parameters1, parameters2	
-	parameters = list(parameters1)	#once this is verified as workign this should be changed to make the second child based off the first parameter set
-	parameters[randomInt] = (parameters1[randomInt] + parameters2[randomInt] ) /2
-	indiv.setParameters(parameters)
+	#parameters = list(parameters1)	#once this is verified as workign this should be changed to make the second child based off the first parameter set
+	#parameters[randomInt] = (parameters1[randomInt] + parameters2[randomInt] ) /2
+	newParameters = []
+	for i in range(len(parameters1)):
+		newParameters.append( (parameters1[i]+parameters2[i]) /2)
+	indiv.setParameters(newParameters)
+
 	newPopulation.append(indiv)
 
 def mutateIndiv(indiv):
-	parameters = mutate(indiv.getparameters())
+	parameters = mutate(indiv.getParameters())
 	indiv.setParameters(parameters)
 
 def mutate (parameters):
@@ -112,52 +116,75 @@ def createPopulation(startParameters, size):
 		population.append(indiv)
 	return population
 
-def geneticSelection(population, targetEffectorPos, selectionThreshold, rejectionThreshold, mutationChance):
-	readyForCrossover = False
-	crossoverParams = []
-	normalCost = 0
-	for i in range(4):
-		print "new Iteration"
-		maxCost = updateCosts(targetEffectorPos)
-		
-		newPopulation = []
-		tempPopulation = population[:]
-		print "normalCost1"
-		for i in list(tempPopulation):	#iterate over a copy of the original population, so we can modify the original
-			
-			normalCost = i.getCost()/maxCost	#sets the normalised cost of the parameters, smaller is better, between 0 and 1
-			print normalCost
-			#do the genetic stuff
-			
-			if (normalCost > selectionThreshold):
-				newPopulation.append(i)
-				if (readyForCrossover):
-					#do crossover stuff
-					crossover(newPopulation, i.getparameters(), crossoverParams)	#should add two new individuals to keep population size constant
-					readyForCrossover = False
-				else:
-					readyForCrossover = True
-					crossoverParams = i.getparameters()
-			
-			if (normalCost > rejectionThreshold):	#is mediocre and we want to keep it
-				newPopulation.append(i)
-			
+def geneticSelection(population, targetEffectorPos):
+	selectionThreshold = 0.6
+	rejectionThreshold = 0.2
+	mutationChance     = 0.5
 
-				#destroy the individual
-			#the ones between the two thresholds dont get destroyed, but also dont get to reproduce
-		
-		#random mutation chance for each individual in population:
-		population = newPopulation[:]
+	for i in range(1000):
+		#print "new Iteration"
+		updateCosts(population, targetEffectorPos)
+
+
+
+		population = sorted(population, key=lambda individual: individual.cost)
+
 		'''
+		for i in range(len(population)):
+			print population[i].getCost()
+		print "\n"
+		'''
+		#print(len(population))
+
+		
+		#bottom third: deleted
+		#middle third: kept
+		#top third: makes children, better score = more children
+		#hardcode population size for now, eventually have it able to support arbitrary population sizes
+
+		#hardcoded values: 
+		#0&1: 2 children
+		#2&3: 1 child
+		#4,5,6: keep
+		#7,8,9 delete
+
+
+		population.remove(population[9])
+		population.remove(population[8])
+		population.remove(population[7])
+
+		crossover(population, population[0].getParameters(), population[1].getParameters())
+		crossover(population, population[0].getParameters(), population[1].getParameters())
+		crossover(population, population[2].getParameters(), population[3].getParameters())
+
+		
+
+
+
+		#print normalCost
+		#do the genetic stuff
+		'''
+		if (normalCost > selectionThreshold):
+			newPopulation.append(i)
+			#newPopulation.append(i)
+			if (readyForCrossover):
+				#do crossover stuff
+				crossover(newPopulation, i.getParameters(), crossoverParams)	#should add two new individuals to keep population size constant
+				readyForCrossover = False
+			else:
+				readyForCrossover = True
+				crossoverParams = i.getParameters()
+		'''
+		
+		
+		#have a chance of mutating everything
 		for indiv in population:
 			if (random.random() < mutationChance):
 				mutateIndiv(indiv)
-		'''
 		
-		print "normalCosts"
-		for i in population:
-			print i.getCost()/maxCost
-		print "len: ", len(population)
+				
+		#print "len: ", len(newPopulation)
+	return population
 		
 
 
@@ -192,23 +219,21 @@ targetEffectorPos = printer.getEffectorPosition()
 population = createPopulation(StartParameters, 10)
 
 
-selectionThreshold = 0.8
-rejectionThreshold = 0.2
-mutationChance     = 0.5
-geneticSelection(population, targetEffectorPos, selectionThreshold, rejectionThreshold, mutationChance)
+
+population = geneticSelection(population, targetEffectorPos)
 
 
 
 
 
 for i in population:
-	print i.getparameters()
+	print i.getParameters()
 print len(population)
 
 '''
 population.remove(population[0])
 
 for i in population:
-	print i.getparameters()
+	print i.getParameters()
 print len(population)
 '''
