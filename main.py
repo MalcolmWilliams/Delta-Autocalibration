@@ -53,18 +53,12 @@ def calculateCost(testPos, targetPos):
 	cost = 0
 	for i in range(3):
 		cost += (testPos[i] - targetPos[i])**2
-	#print cost
-	#print testPos, targetPos
 	return cost
 
 def updateCosts(population, targetEffectorPos, travelDist):
-	#maxCost = 0
-	#print"costs"
 	for i in range(len(population)):
 		#calculates a new effector position and then the resulting cost.
 		printer.setParameters(population[i].getParameters())
-		#print population[i].getParameters()
-		#print "printer effector position:", printer.getEffectorPosition()
 		cost = 0
 		for j in range(len(travelDist)):	#targetEffectorPos is a 2d Array
 			printer.setParameters(travelDist[j])
@@ -72,22 +66,10 @@ def updateCosts(population, targetEffectorPos, travelDist):
 			cost += calculateCost(population[i].getEffectorPos(), targetEffectorPos[j])
 		population[i].setCost(cost)
 
-		#if (maxCost < cost):
-		#	maxCost = cost
-		#print cost
-		#print cost
-
-	#print "maxCost\n", maxCost
-	#return maxCost
 
 def crossover(newPopulation, parameters1, parameters2):
 	#average a random parameter and append the new thing to the population array.
-	#for i in range(2):
 	indiv = individual()
-	#randomInt = random.randint(0,len(parameters1)-1)
-	#print parameters1, parameters2	
-	#parameters = list(parameters1)	#once this is verified as workign this should be changed to make the second child based off the first parameter set
-	#parameters[randomInt] = (parameters1[randomInt] + parameters2[randomInt] ) /2
 	newParameters = []
 	for i in range(len(parameters1)):
 		newParameters.append( (parameters1[i]+parameters2[i]) /2)
@@ -113,7 +95,6 @@ def createPopulation(startParameters, size):
 		parameters = list(startParameters)
 		indiv = individual()
 		parameters = mutate(parameters)
-		#print parameters
 		indiv.setParameters(parameters)
 		population.append(indiv)
 	return population
@@ -123,22 +104,12 @@ def geneticSelection(population, targetEffectorPos, travelDist):
 	rejectionThreshold = 0.2
 	mutationChance     = 0.5
 
-	for i in range(1000):
+	for i in range(30000):
 		#print "new Iteration"
 		updateCosts(population, targetEffectorPos, travelDist)
 
-
-
 		population = sorted(population, key=lambda individual: individual.cost)
 
-		'''
-		for i in range(len(population)):
-			print population[i].getCost()
-		print "\n"
-		'''
-		#print(len(population))
-
-		
 		#bottom third: deleted
 		#middle third: kept
 		#top third: makes children, better score = more children
@@ -159,38 +130,12 @@ def geneticSelection(population, targetEffectorPos, travelDist):
 		crossover(population, population[2].getParameters(), population[3].getParameters())
 
 		
-
-
-
-		#print normalCost
-		#do the genetic stuff
-		'''
-		if (normalCost > selectionThreshold):
-			newPopulation.append(i)
-			#newPopulation.append(i)
-			if (readyForCrossover):
-				#do crossover stuff
-				crossover(newPopulation, i.getParameters(), crossoverParams)	#should add two new individuals to keep population size constant
-				readyForCrossover = False
-			else:
-				readyForCrossover = True
-				crossoverParams = i.getParameters()
-		'''
-		
-		
 		#have a chance of mutating everything
 		for indiv in population:
 			if (random.random() < mutationChance):
 				mutateIndiv(indiv)
 		
-				
-		#print "len: ", len(newPopulation)
 	return population
-		
-
-
-
-
 
 targetParameters = 	[
 						-86.6,  86,   0,		#lower x
@@ -200,8 +145,6 @@ targetParameters = 	[
 						-50,   -50, 100,		#upper y
 					]
 
-
-
 StartParameters = 	[
 						-85.6,  86,   0,	    #lower x
 						-50,   -50, 100,		#lower y
@@ -209,7 +152,6 @@ StartParameters = 	[
 						-86.6,  86,   0,	    #upper x
 						-50,   -50, 100,		#upper y
 					]
-
 
 #the set of carriage locations to generate the test points
 travelDist = [
@@ -231,37 +173,18 @@ travelDist = [
 	[10, 50, 10],
 	]
 
-
 printer = PrinterModel.PrinterModel()
 printer.setParameters(targetParameters)
 
 
 targetEffectorPos = []
 for i in travelDist:
-	#print i
 	printer.setParameters(i)
 	targetEffectorPos.append(printer.getEffectorPosition())
 
-#print targetEffectorPos
-
 population = createPopulation(StartParameters, 10)
-
-
 
 population = geneticSelection(population, targetEffectorPos, travelDist)
 
-
-
-
-
 for i in population:
 	print i.getParameters()
-print len(population)
-
-'''
-population.remove(population[0])
-
-for i in population:
-	print i.getParameters()
-print len(population)
-'''
