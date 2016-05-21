@@ -1,6 +1,6 @@
-#time profile
-import main
+#tthuis usime profile
+import GeneticOptimization
 import cProfile
 
-ga = main.GeneticOptimization()
-cProfile.run('ga.run()')
+gOpt = GeneticOptimization.GeneticOptimization()
+cProfile.run('gOpt.run()')

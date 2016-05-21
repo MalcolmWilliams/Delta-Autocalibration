@@ -81,11 +81,10 @@ class GeneticOptimization( object ):
 		newPopulation.append(indiv)
 
 	def mutateIndiv(self, indiv):
-		parameters = self.mutate(indiv.getParameters())
+		parameters = self.mutate(indiv.getParameters(),1)
 		indiv.setParameters(parameters)
 
-	def mutate (self, parameters):
-		scaleFactor = 1
+	def mutate (self, parameters, scaleFactor):
 		randomInt = random.randint(0,len(parameters)-1)
 		randomVal = random.random() * scaleFactor - 0.5 * scaleFactor
 		parameters[randomInt] = parameters[randomInt] + randomVal
@@ -97,7 +96,7 @@ class GeneticOptimization( object ):
 		for i in range(size):
 			parameters = list(startParameters)
 			indiv = individual()
-			parameters = self.mutate(parameters)
+			parameters = self.mutate(parameters,1)
 			indiv.setParameters(parameters)
 			population.append(indiv)
 		return population
@@ -108,7 +107,7 @@ class GeneticOptimization( object ):
 		mutationChance     = 0.5
 		#timeSinceLastExtinction = 0
 
-		for i in range(1000):
+		for i in range(10000):
 			#print "new Iteration"
 			self.updateCosts(population, targetEffectorPos, travelDist, printer)
 
@@ -185,6 +184,25 @@ class GeneticOptimization( object ):
 			[10.001, 10, 50],
 			[50, 10, 10],
 			[10, 50, 10],
+
+
+
+			[69.999, 70, 70],
+			[30, 70, 70],
+			[70, 30, 70],
+			[69.999, 70, 30],
+
+			[10, 70, 70],
+			[70, 10, 70],
+			[69.999, 70, 10],
+
+			[30.001, 30, 70],
+			[70, 30, 30],
+			[30, 70, 30],
+
+			[10.001, 10, 70],
+			[70, 10, 10],
+			[10, 70, 10],
 			]
 
 		printer = PrinterModel.PrinterModel()
