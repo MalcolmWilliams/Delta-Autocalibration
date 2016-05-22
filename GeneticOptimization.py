@@ -105,9 +105,9 @@ class GeneticOptimization( object ):
 		selectionThreshold = 0.6
 		rejectionThreshold = 0.2
 		mutationChance     = 0.5
-		#timeSinceLastExtinction = 0
+		timeSinceLastExtinction = 0
 
-		for i in range(10000):
+		for i in range(1000):
 			#print "new Iteration"
 			self.updateCosts(population, targetEffectorPos, travelDist, printer)
 
@@ -138,7 +138,7 @@ class GeneticOptimization( object ):
 				if (random.random() < mutationChance):
 					self.mutateIndiv(indiv)
 
-			'''
+			'''	
 			timeSinceLastExtinction+=1
 			#extinction event
 			if (timeSinceLastExtinction == 100):
@@ -158,7 +158,7 @@ class GeneticOptimization( object ):
 								-50,   -50, 100,		#upper y
 							]
 
-		StartParameters = 	[
+		startParameters = 	[
 								-85.6,  86,   0,	    #lower x
 								-50,   -50, 100,		#lower y
 
@@ -214,10 +214,21 @@ class GeneticOptimization( object ):
 			printer.setParameters(i)
 			targetEffectorPos.append( printer.getEffectorPosition()[2] )	#only get the z value
 
-		population = self.createPopulation(StartParameters, 10)
+		population = self.createPopulation(startParameters, 10)
 
 		population = self.geneticSelection(population, targetEffectorPos, travelDist, printer)
 
-		for i in population:
-			print i.getParameters()
+		#for i in population:
+		#	print i.getParameters()
+		
+		realCost = 0
+		parameters = population[0].getParameters()
+		for i in range(len(parameters)):
+			realCost+=(parameters[i]-startParameters[i])**2
+		print "realCost:", math.sqrt(realCost) 
 
+if (__name__ == "__main__"):
+	printer = PrinterModel.PrinterModel()
+	ga = GeneticOptimization()
+	for i in range(3):
+		ga.run()
