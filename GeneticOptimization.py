@@ -64,7 +64,7 @@ class GeneticOptimization( object ):
 			printer.setParameters(population[i].getParameters())
 			cost = 0
 			for j in range(len(travelDist)):	#targetEffectorPos is a 2d Array
-				printer.setParameters(travelDist[j])
+				printer.setTravelDist(travelDist[j])
 				population[i].setEffectorPos(printer.getEffectorPosition())
 				cost += self.calculateCost(population[i].getEffectorPos(), targetEffectorPos[j])
 			population[i].setCost(cost)
@@ -107,44 +107,44 @@ class GeneticOptimization( object ):
 		mutationChance     = 0.5
 		timeSinceLastExtinction = 0
 
+		numKill = 30 #how many of the population to kill each time
+
 		for i in range(1000):
 			#print "new Iteration"
 			self.updateCosts(population, targetEffectorPos, travelDist, printer)
 
 			population = sorted(population, key=lambda individual: individual.cost)
 
-			#bottom third: deleted
-			#middle third: kept
-			#top third: makes children, better score = more children
-			#hardcode population size for now, eventually have it able to support arbitrary population sizes
+			iteration = 0
+			childrenToMake = numKill 	#we want the population to remain at a constant size
+			population = population[0:len(population)-numKill]	#remove the ones we want to destroy
 
-			#hardcoded values: 
-			#0&1: 2 children
-			#2&3: 1 child
-			#4,5,6: keep
-			#7,8,9 delete
-
-			population.remove(population[9])
-			population.remove(population[8])
-			population.remove(population[7])
-			
+			while not(childrenToMake == 1):	#keeps iterating until there is only one child to make
+				numChild = childrenToMake/2
+				childrenToMake -= numChild
+				for i in range(numChild):
+					self.crossover(population, population[i].getParameters(), population[iteration].getParameters())
+					
+				iteration += 1
 			self.crossover(population, population[0].getParameters(), population[1].getParameters())
-			self.crossover(population, population[0].getParameters(), population[1].getParameters())
-			self.crossover(population, population[2].getParameters(), population[3].getParameters())
-
 			
 			#have a chance of mutating everything
 			for indiv in population:
 				if (random.random() < mutationChance):
 					self.mutateIndiv(indiv)
 
-			'''	
+			'''
 			timeSinceLastExtinction+=1
 			#extinction event
 			if (timeSinceLastExtinction == 100):
-				population = self.createPopulation(population[0].getParameters(), 10)
+				tempParameters0 = population[0].getParameters()
+				tempParameters1 = population[1].getParameters()
+
+				population = self.createPopulation(tempParameters0, 10)
+				#population = self.createPopulation(tempParameters1, 5)
 				timeSinceLastExtinction = 0
 			'''
+			
 			
 		return population
 
@@ -184,9 +184,9 @@ class GeneticOptimization( object ):
 			[10.001, 10, 50],
 			[50, 10, 10],
 			[10, 50, 10],
+			#]
 
-
-
+			#'''
 			[69.999, 70, 70],
 			[30, 70, 70],
 			[70, 30, 70],
@@ -203,7 +203,8 @@ class GeneticOptimization( object ):
 			[10.001, 10, 70],
 			[70, 10, 10],
 			[10, 70, 10],
-			]
+		]
+		#'''
 
 		printer = PrinterModel.PrinterModel()
 		printer.setParameters(targetParameters)
@@ -211,24 +212,26 @@ class GeneticOptimization( object ):
 
 		targetEffectorPos = []
 		for i in travelDist:
-			printer.setParameters(i)
+			printer.setTravelDist(i)
 			targetEffectorPos.append( printer.getEffectorPosition()[2] )	#only get the z value
 
-		population = self.createPopulation(startParameters, 10)
+		population = self.createPopulation(startParameters, 100)
 
 		population = self.geneticSelection(population, targetEffectorPos, travelDist, printer)
 
 		#for i in population:
 		#	print i.getParameters()
 		
+		print population[0].getParameters()
+
 		realCost = 0
 		parameters = population[0].getParameters()
 		for i in range(len(parameters)):
-			realCost+=(parameters[i]-startParameters[i])**2
+			realCost+=(parameters[i]-targetParameters[i])**2
 		print "realCost:", math.sqrt(realCost) 
 
 if (__name__ == "__main__"):
 	printer = PrinterModel.PrinterModel()
 	ga = GeneticOptimization()
-	for i in range(3):
+	for i in range(5):
 		ga.run()
