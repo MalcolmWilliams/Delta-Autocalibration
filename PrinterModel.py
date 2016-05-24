@@ -27,24 +27,19 @@ class PrinterModel:
 
 		[-86.6,86,0],	#upper x
 		[-50,-50,100],		#upper y
-		#[120,121,122]
 		[towerHeight,towerHeight,towerHeight]				#upper z
 	]
 
-	def getParameters(self):
-		return self.travelDist
+	def setTravelDist(self, newTravelDist):
+		self.travelDist = newTravelDist
+		#print self.travelDist
 
 	def setParameters(self, parameters):
-		if(len(parameters) == 3):	#only change the carriage travel distances
-			self.travelDist = parameters
-
-		elif(len(parameters) == 12):
-			#print self.towerVertices
-			self.towerVertices[0][:] = parameters[0:3]
-			self.towerVertices[1][:] = parameters[3:6]
-			self.towerVertices[3][:] = parameters[6:9]
-			self.towerVertices[4][:] = parameters[9:12]
-		return parameters
+		self.towerVertices[0][:] = parameters[0:3]
+		self.towerVertices[1][:] = parameters[3:6]
+		self.towerVertices[3][:] = parameters[6:9]
+		self.towerVertices[4][:] = parameters[9:12]
+		#print parameters
 
 		
 	def setRandDist(self, idx,val):
