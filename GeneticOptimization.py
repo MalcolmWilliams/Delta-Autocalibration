@@ -50,13 +50,14 @@ class individual( object ):
 
 class GeneticOptimization( object ):
 	def calculateCost(self, testPos, targetPos):
+		
 		'''
 		cost = 0
 		for i in range(3):
 			cost += (testPos[i] - targetPos[i])**2
 		return cost
 		'''
-		return (testPos[2]-targetPos)**2
+		return (testPos[2]-targetPos)**2	#only calcuate based off the z position
 
 	def updateCosts(self, population, targetEffectorPos, travelDist, printer):
 		for i in range(len(population)):
@@ -66,7 +67,8 @@ class GeneticOptimization( object ):
 			for j in range(len(travelDist)):	#targetEffectorPos is a 2d Array
 				printer.setTravelDist(travelDist[j])
 				population[i].setEffectorPos(printer.getEffectorPosition())
-				cost += self.calculateCost(population[i].getEffectorPos(), targetEffectorPos[j])
+				cost += (population[i].getEffectorPos()[2] - targetEffectorPos[j])**2
+			#print  "cost", cost #the percieved deviation (difference in target z end effector position and calculated)
 			population[i].setCost(cost)
 
 
@@ -80,8 +82,8 @@ class GeneticOptimization( object ):
 
 		newPopulation.append(indiv)
 
-	def mutateIndiv(self, indiv):
-		parameters = self.mutate(indiv.getParameters(),1)
+	def mutateIndiv(self, indiv, scaleFactor):
+		parameters = self.mutate(indiv.getParameters(),scaleFactor)
 		indiv.setParameters(parameters)
 
 	def mutate (self, parameters, scaleFactor):
@@ -102,16 +104,27 @@ class GeneticOptimization( object ):
 		return population
 
 	def geneticSelection(self, population, targetEffectorPos, travelDist, printer):
-		selectionThreshold = 0.6
-		rejectionThreshold = 0.2
 		mutationChance     = 0.5
-		timeSinceLastExtinction = 0
+		scaleFactor = 1
 
 		numKill = 30 #how many of the population to kill each time
+		numIterations = 1000
+		for i in range(numIterations):
 
-		for i in range(1000):
-			#print "new Iteration"
+			#try different muatation rates: constant, linear decay, exponential decay
+			#scaleFactor = 1 - i/(numIterations)	#linear decay
+			#scaleFactor = math.exp(-numIterations/10) #exponenetial decay
+
+
+			#make less chance of mutation for better, or only accept mutation if beneficial
+			#possible issue zeroing in on solution since all have a chance to mutate.
+			for indiv in population:
+				if (random.random() < mutationChance):
+					self.mutateIndiv(indiv, scaleFactor)
+
 			self.updateCosts(population, targetEffectorPos, travelDist, printer)
+
+
 
 			population = sorted(population, key=lambda individual: individual.cost)
 
@@ -127,25 +140,7 @@ class GeneticOptimization( object ):
 					
 				iteration += 1
 			self.crossover(population, population[0].getParameters(), population[1].getParameters())
-			
-			#have a chance of mutating everything
-			for indiv in population:
-				if (random.random() < mutationChance):
-					self.mutateIndiv(indiv)
-
-			'''
-			timeSinceLastExtinction+=1
-			#extinction event
-			if (timeSinceLastExtinction == 100):
-				tempParameters0 = population[0].getParameters()
-				tempParameters1 = population[1].getParameters()
-
-				population = self.createPopulation(tempParameters0, 10)
-				#population = self.createPopulation(tempParameters1, 5)
-				timeSinceLastExtinction = 0
-			'''
-			
-			
+	
 		return population
 
 
@@ -159,11 +154,11 @@ class GeneticOptimization( object ):
 							]
 
 		startParameters = 	[
-								-85.6,  86,   0,	    #lower x
-								-50,   -50, 100,		#lower y
+								-85.6,  85,   1,	    #lower x
+								-51,   -51, 99,		#lower y
 
-								-86.6,  86,   0,	    #upper x
-								-50,   -50, 100,		#upper y
+								-85.6,  85,   1,	    #upper x
+								-51,   -51, 101,		#upper y
 							]
 
 		#the set of carriage locations to generate the test points
@@ -184,9 +179,8 @@ class GeneticOptimization( object ):
 			[10.001, 10, 50],
 			[50, 10, 10],
 			[10, 50, 10],
-			#]
-
-			#'''
+		]
+		'''
 			[69.999, 70, 70],
 			[30, 70, 70],
 			[70, 30, 70],
@@ -204,7 +198,7 @@ class GeneticOptimization( object ):
 			[70, 10, 10],
 			[10, 70, 10],
 		]
-		#'''
+		'''
 
 		printer = PrinterModel.PrinterModel()
 		printer.setParameters(targetParameters)
@@ -228,7 +222,7 @@ class GeneticOptimization( object ):
 		parameters = population[0].getParameters()
 		for i in range(len(parameters)):
 			realCost+=(parameters[i]-targetParameters[i])**2
-		print "realCost:", math.sqrt(realCost) 
+		print "realCost:", math.sqrt(realCost)
 
 if (__name__ == "__main__"):
 	printer = PrinterModel.PrinterModel()

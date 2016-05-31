@@ -1,55 +1,31 @@
-#test of new population control algoritm
+#test to se if averaging several of the final values will give a decent result
 
-class Individual:
+import math
 
-
-	parent1 = None
-	parent2 = None
-	name = None
-
-
-	def __init__ (self, p1, p2, n):
-		self.parent2 = p2
-		self.parent1 = p1
-		self.name = n
-
-	def getName(self):
-		return self.name
-
-	def getParents(self):
-		return self.parent1, self.parent2
-
-	def setParents(self, p1, p2):
-		self.parent1 = p1
-		self.parent2 = p2
-
-population = []
-for i in range(100):
-	indiv = Individual(i,i,i)
-	population.append(indiv)
+data = [
+[-86.55671898825699, 86.02107068381821, 0.008232354436725861, -50.01043606917216, -49.9975933095585, 100.02310688061948, -86.58840631007789, 86.02266157437775, -0.005874043378351864, -50.041660270507776, -50.008035469831555, 99.96147904945319],
+[-86.53319217193997, 86.03248757254117, -0.18190788487838103, -50.088445171764235, -49.97389115028729, 99.99949693624251, -86.6159734207761, 86.00140147342633, -0.12102134072856857, -50.15839577748666, -49.98968036837162, 99.91038559036686],
+[-86.36800742509311, 86.19914484147365, -0.1182395432444347, -50.086909603831884, -49.832637601267685, 100.18448246579824, -86.59665105043374, 86.02221477481552, 0.09303896118141708, -49.99066066480509, -50.0150680381532, 99.98957937984781],
+[-86.48759441704465, 86.09605428338071, -0.04708237873579367, -50.03652802798695, -49.94582542067289, 100.01491741518691, -86.6022275359065, 86.00726048220696, 0.04721130860410855, -50.01197862201415, -50.02079999603101, 99.98089098446236],
+[-86.4946042061855, 86.09564122576023, -0.028244510819369552, -50.01979450766985, -49.946301819125814, 100.01644011439083, -86.58860638315625, 86.07825823413704, 0.055150198947007484, -49.99625985464618, -50.00532643306142, 100.00042433395228]
+]
 
 
-numKill = 50
-iteration = 0
-childrenToMake = numKill 	#we want the population to remain at a constant size
+targetParameters = 	[
+						-86.6,  86,   0,		#lower x
+						-50,   -50, 100,		#lower y
 
-population = population[0:len(population)-numKill]	#remove the ones we want to destroy
+						-86.6,  86,   0,	    #upper x
+						-50,   -50, 100,		#upper y
+					]
+parameters = []
+for i in range(len(data[0])):
+	total = 0
+	for j in range(5):
+		total+= data[j][i]
+	parameters.append(total/5)
 
-while not(childrenToMake == 1):	#keeps iterating until there is only one child to make
-	numChild = childrenToMake/2
-	childrenToMake -= numChild
-	#for i in range()
-	for i in range(numChild):
-
-		population.append(Individual(i, iteration, 11))
-
-	iteration += 1
-population.append(Individual(0,1,11))
-	#print numChild
-
-
-for p in population:
-	print p.getParents()
-
-
-print len (population)
+realCost = 0
+for i in range(len(parameters)):
+	realCost+=(parameters[i]-targetParameters[i])**2
+print "realCost:", math.sqrt(realCost)
