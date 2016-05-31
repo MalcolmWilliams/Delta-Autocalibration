@@ -1,0 +1,35 @@
+[-86.76714154623812, 83.97220775479964, -0.5092808627120475, -51.503523773346636, -51.68051260337663, 99.1039358555648, -86.70104290492299, 87.01500643235879, -0.5404873784648252, -49.963334795897325, -50.8243581158606, 101.00038140914188]
+realCost: 3.64707141665
+         8229893 function calls in 30.862 seconds
+
+   Ordered by: standard name
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.000    0.000   30.862   30.862 <string>:1(<module>)
+        1    0.093    0.093   30.860   30.860 GeneticOptimization.py:106(geneticSelection)
+   100000    0.014    0.000    0.014    0.000 GeneticOptimization.py:129(<lambda>)
+        1    0.000    0.000   30.862   30.862 GeneticOptimization.py:147(run)
+    79992    0.021    0.000    0.021    0.000 GeneticOptimization.py:32(setParameters)
+  1300000    0.552    0.000    0.552    0.000 GeneticOptimization.py:35(setEffectorPos)
+   100000    0.026    0.000    0.026    0.000 GeneticOptimization.py:38(setCost)
+   209894    0.035    0.000    0.035    0.000 GeneticOptimization.py:41(getParameters)
+  1300000    0.215    0.000    0.215    0.000 GeneticOptimization.py:44(getEffectorPos)
+     1000    3.178    0.003   30.205    0.030 GeneticOptimization.py:62(updateCosts)
+    30000    0.168    0.000    0.226    0.000 GeneticOptimization.py:75(crossover)
+    49892    0.051    0.000    0.254    0.000 GeneticOptimization.py:85(mutateIndiv)
+    49992    0.062    0.000    0.182    0.000 GeneticOptimization.py:89(mutate)
+        1    0.000    0.000    0.001    0.001 GeneticOptimization.py:95(createPopulation)
+  1300013    0.284    0.000    0.284    0.000 PrinterModel.py:37(setTravelDist)
+   100001    0.152    0.000    0.152    0.000 PrinterModel.py:41(setParameters)
+  1300013    0.941    0.000   25.717    0.000 PrinterModel.py:54(getEffectorPosition)
+    49992    0.081    0.000    0.086    0.000 random.py:175(randrange)
+    49992    0.025    0.000    0.110    0.000 random.py:238(randint)
+  1300013   24.777    0.000   24.777    0.000 {kinematics_c.getEffectorPos}
+   181993    0.029    0.000    0.029    0.000 {len}
+        1    0.000    0.000    0.000    0.000 {math.sqrt}
+   390113    0.036    0.000    0.036    0.000 {method 'append' of 'list' objects}
+        1    0.000    0.000    0.000    0.000 {method 'disable' of '_lsprof.Profiler' objects}
+   199984    0.017    0.000    0.017    0.000 {method 'random' of '_random.Random' objects}
+   136003    0.056    0.000    0.056    0.000 {range}
+     1000    0.049    0.000    0.063    0.000 {sorted}
+

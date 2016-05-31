@@ -1,15 +1,28 @@
 import math
 
-def getEffectorPos(carriagePos, arms):
 
-		l12, l12mag, l121, l121mag = getPerp(arms[0], arms[1], carriagePos[0][:], carriagePos[1][:])
-		l23, l23mag, l232, l232mag = getPerp(arms[1], arms[2], carriagePos[1][:], carriagePos[2][:])
 
-		p0 = carriagePos[0][:]
-		p1 = carriagePos[1][:]
-		p2 = carriagePos[2][:]
+def getEffectorPos(towerVertices, travelDist, arms):
 
-		p012 = getPlane(line(p0, p1)[0], line(p1, p2)[0], p2)
+		p = []
+		#update the carriage positions
+		for i in range (3):
+			towerLength = math.sqrt( (towerVertices[0][i]-towerVertices[3][i])**2 + (towerVertices[1][i]-towerVertices[4][i])**2 + (towerVertices[2][i]-towerVertices[5][i])**2)
+
+			for j in range (3):
+				#do similar triangles for each of the three axies
+				#carriagePos[j][i] =  towerVertices[i][j] - ((towerVertices[i][j]-towerVertices[i+3][j]) * (towerLength-travelDist[j]) / towerLength)
+				p.append(   towerVertices[i][j] - ((towerVertices[i][j]-towerVertices[i+3][j]) * (towerLength-travelDist[j]) / towerLength) )
+		
+		p0 = p[0:3]#carriagePos[0][:]
+		p1 = p[3:6]#carriagePos[1][:]
+		p2 = p[6:9]#carriagePos[2][:]
+		
+		l12, l12mag, l121, l121mag = getPerp(arms[0], arms[1], p0, p1)
+		l23, l23mag, l232, l232mag = getPerp(arms[1], arms[2], p1, p2)
+
+
+		p012 = getPlane(line(p0, p1), line(p1, p2), p2)
 
 		#get the plane of each perpendicular plane	
 		p12 = planeFromLinePoint(l12, l121)	#normal, calculate d ***need to make sure normal is correct***
@@ -34,6 +47,7 @@ def cross(v0, v1):
 	return [ v0[1]*v1[2] - v0[2]*v1[1], -v0[0]*v1[2] + v0[2]*v1[0], v0[0]*v1[1] - v0[1]*v1[0] ]
 
 def line(p0, p1):
+	'''
 	l = []
 	lmag = 0
 	for i in range(3):
@@ -42,10 +56,17 @@ def line(p0, p1):
 	lmag = math.sqrt(lmag)
 
 	return l, lmag
+	'''
+	#only get the line length
+	return [ (p1[0]-p0[0]), (p1[1]-p0[1]), (p1[2]-p0[2]) ]
+
+def getMag(l):
+	return math.sqrt(l[0]**2+l[1]**2+l[2]**2)
 
 def getPerp(r1, r2, carriagePos0, carriagePos1):
 
-	l12, l12mag = line(carriagePos0, carriagePos1)
+	l12 = line(carriagePos0, carriagePos1)
+	l12mag = getMag(l12)
 	l121mag = (r1**2 - r2**2 + l12mag**2)/(2*l12mag)
 	l121 = []
 

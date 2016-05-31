@@ -2,8 +2,8 @@ import time
 import datetime
 import random
 import math
-import kinematics_py as kinematics
-#import kinematics_c as kinematics
+#import kinematics_py as kinematics
+import kinematics_c as kinematics
 
 class PrinterModel:
 	#for calculating the kinematics	
@@ -12,11 +12,13 @@ class PrinterModel:
 	arms = [122,120,120]
 
 	#locationsof the carriages, updated by method updateCarriagePosition
+	'''
 	carriagePos = [
 	[0,1,0],		#x
 	[0,0,1],		#y
 	[0,0,0],		#z	
 	]		
+	'''	
 
 	travelDist = [5,50,50]
 
@@ -53,15 +55,9 @@ class PrinterModel:
 		#see notebook for better explanation.
 		#datastructures needed: arms, carriagePos
 
-		#update the carriage positions
-		for i in range (3):
-			towerLength = math.sqrt( (self.towerVertices[0][i]-self.towerVertices[3][i])**2 + (self.towerVertices[1][i]-self.towerVertices[4][i])**2 + (self.towerVertices[2][i]-self.towerVertices[5][i])**2)
+		#self.carriagePos = kinematics.updateCarriagePos(self.towerVertices, self.travelDist)
 
-			for j in range (3):
-				#do similar triangles for each of the three axies
-				self.carriagePos[j][i] =  self.towerVertices[i][j] - ((self.towerVertices[i][j]-self.towerVertices[i+3][j]) * (towerLength-self.travelDist[j]) / towerLength)
-
-		effectPos = kinematics.getEffectorPos(self.carriagePos, self.arms)
+		effectPos = kinematics.getEffectorPos(self.towerVertices, self.travelDist, self.arms)
 		return effectPos
 
 
