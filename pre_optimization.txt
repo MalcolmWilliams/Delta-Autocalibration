@@ -1,0 +1,42 @@
+[-85.99081777529203, 86.60852924893402, 0.6123584914669249, -50.995880032284866, -50.97048849501649, 99.05089436473847, -85.99793921699339, 86.62705384200646, 0.6095425860007011, -50.98592774102424, -50.98379392659209, 99.02932611843089]
+realCost: 2.82137340183
+         73233414 function calls in 82.390 seconds
+
+   Ordered by: standard name
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.000    0.000   82.390   82.390 <string>:1(<module>)
+        1    0.114    0.114   82.387   82.387 GeneticOptimization.py:106(geneticSelection)
+   100000    0.023    0.000    0.023    0.000 GeneticOptimization.py:129(<lambda>)
+        1    0.000    0.000   82.390   82.390 GeneticOptimization.py:147(run)
+    80311    0.025    0.000    0.025    0.000 GeneticOptimization.py:32(setParameters)
+  1300000    0.520    0.000    0.520    0.000 GeneticOptimization.py:35(setEffectorPos)
+   100000    0.035    0.000    0.035    0.000 GeneticOptimization.py:38(setCost)
+   210213    0.046    0.000    0.046    0.000 GeneticOptimization.py:41(getParameters)
+  1300000    0.263    0.000    0.263    0.000 GeneticOptimization.py:44(getEffectorPos)
+     1000    3.485    0.003   81.615    0.082 GeneticOptimization.py:62(updateCosts)
+    30000    0.190    0.000    0.257    0.000 GeneticOptimization.py:75(crossover)
+    50211    0.060    0.000    0.293    0.000 GeneticOptimization.py:85(mutateIndiv)
+    50311    0.074    0.000    0.210    0.000 GeneticOptimization.py:89(mutate)
+        1    0.000    0.000    0.001    0.001 GeneticOptimization.py:95(createPopulation)
+  1300013    0.335    0.000    0.335    0.000 PrinterModel.py:35(setTravelDist)
+   100001    0.224    0.000    0.224    0.000 PrinterModel.py:39(setParameters)
+  1300013   20.872    0.000   76.654    0.000 PrinterModel.py:52(getEffectorPosition)
+  1300013    2.792    0.000    3.074    0.000 kinematics_py.py:110(distAlongLine)
+  1300013    8.249    0.000   53.368    0.000 kinematics_py.py:3(getEffectorPos)
+  1300013    1.773    0.000    1.773    0.000 kinematics_py.py:31(cross)
+  5200052   15.667    0.000   20.031    0.000 kinematics_py.py:36(line)
+  2600026    9.674    0.000   21.959    0.000 kinematics_py.py:46(getPerp)
+  1300013    2.833    0.000    5.382    0.000 kinematics_py.py:57(getPlane)
+  2600026    1.870    0.000    1.870    0.000 kinematics_py.py:76(planeFromLinePoint)
+  1300013    3.278    0.000    3.278    0.000 kinematics_py.py:79(intersection3Planes)
+    50311    0.091    0.000    0.096    0.000 random.py:175(randrange)
+    50311    0.028    0.000    0.125    0.000 random.py:238(randint)
+   182312    0.037    0.000    0.037    0.000 {len}
+ 10400105    1.962    0.000    1.962    0.000 {math.sqrt}
+ 25090360    3.156    0.000    3.156    0.000 {method 'append' of 'list' objects}
+        1    0.000    0.000    0.000    0.000 {method 'disable' of '_lsprof.Profiler' objects}
+   200622    0.021    0.000    0.021    0.000 {method 'random' of '_random.Random' objects}
+ 14436146    4.629    0.000    4.629    0.000 {range}
+     1000    0.062    0.000    0.085    0.000 {sorted}
+
