@@ -1,7 +1,7 @@
 import PrinterModel
 import math
 import random
-
+import time
 
 '''
 basis of genetic algorithms
@@ -49,6 +49,21 @@ class individual( object ):
 
 
 class GeneticOptimization( object ):
+	populationSize = 100
+	numKill = 30
+	mutationChance = 0.5
+	muationScale = 1
+	numIterations = 1000
+	crossoverType = 1
+
+	def __init__(self, populationSize, numKill, mutationChance, mutationScale, numIterations, crossoverType):
+		self.populationSize = populationSize
+		self.numKill = numKill
+		self.mutationChance = mutationChance
+		self.mutationScale = mutationScale
+		self.numIterations = numIterations
+		self.crossoverType = crossoverType
+
 	def calculateCost(self, testPos, targetPos):
 		
 		'''
@@ -72,12 +87,25 @@ class GeneticOptimization( object ):
 			population[i].setCost(cost)
 
 
-	def crossover(self, newPopulation, parameters1, parameters2):
+	def crossoverAverage(self, newPopulation, parameters1, parameters2):
 		#average a random parameter and append the new thing to the population array.
 		indiv = individual()
 		newParameters = []
 		for i in range(len(parameters1)):
 			newParameters.append( (parameters1[i]+parameters2[i]) /2)
+		indiv.setParameters(newParameters)
+
+		newPopulation.append(indiv)
+
+	def crossoverRandomAverage(self, newPopulation, parameters1, parameters2):
+		#average a random parameter and append the new thing to the population array.
+		indiv = individual()
+		newParameters = []
+		for i in range(len(parameters1)):
+			if(random.random() < 0.5):
+				newParameters.append( (parameters1[i]+parameters2[i]) /2)
+			else:
+				newParameters.append(parameters1)	#skew towards the more favorable one.
 		indiv.setParameters(newParameters)
 
 		newPopulation.append(indiv)
@@ -103,13 +131,47 @@ class GeneticOptimization( object ):
 			population.append(indiv)
 		return population
 
-	def geneticSelection(self, population, targetEffectorPos, travelDist, printer):
-		mutationChance     = 0.5
-		scaleFactor = 1
+	def crossover1(self, population):
 
-		numKill = 30 #how many of the population to kill each time
-		numIterations = 1000
-		for i in range(numIterations):
+		iteration = 0
+		childrenToMake = self.numKill 	#we want the population to remain at a constant size
+		population = population[0:len(population)-self.numKill]	#remove the ones we want to destroy
+
+		while not(childrenToMake == 1):	#keeps iterating until there is only one child to make
+			numChild = childrenToMake/2
+			childrenToMake -= numChild
+			for i in range(numChild):
+				self.crossoverAverage(population, population[i].getParameters(), population[iteration].getParameters())
+				
+			iteration += 1
+		self.crossoverAverage(population, population[0].getParameters(), population[1].getParameters())
+
+	def crossover2(self, population):
+		
+		iteration = 0
+		childrenToMake = self.numKill 	#we want the population to remain at a constant size
+		population = population[0:len(population)-self.numKill]	#remove the ones we want to destroy
+
+		while not(childrenToMake == 1):	#keeps iterating until there is only one child to make
+			numChild = childrenToMake/2
+			childrenToMake -= numChild
+			for i in range(numChild):
+				self.crossoverRandomAverage(population, population[i].getParameters(), population[iteration].getParameters())
+				
+			iteration += 1
+		self.crossoverRandomAverage(population, population[0].getParameters(), population[1].getParameters())
+	
+	def crossover3(self, population):
+		val = 0
+
+
+	def geneticSelection(self, population, targetEffectorPos, travelDist, printer):
+		#mutationChance     = 0.5
+		#scaleFactor = 1
+
+		#numKill = 30 #how many of the population to kill each time
+		#numIterations = 1000
+		for i in range(self.numIterations):
 
 			#try different muatation rates: constant, linear decay, exponential decay
 			#scaleFactor = 1 - i/(numIterations)	#linear decay
@@ -119,39 +181,25 @@ class GeneticOptimization( object ):
 			#make less chance of mutation for better, or only accept mutation if beneficial
 			#possible issue zeroing in on solution since all have a chance to mutate.
 			for indiv in population:
-				if (random.random() < mutationChance):
-					self.mutateIndiv(indiv, scaleFactor)
+				if (random.random() < self.mutationChance):
+					self.mutateIndiv(indiv, self.mutationScale)
 
 			self.updateCosts(population, targetEffectorPos, travelDist, printer)
 
 
 
 			population = sorted(population, key=lambda individual: individual.cost)
-
-			iteration = 0
-			childrenToMake = numKill 	#we want the population to remain at a constant size
-			population = population[0:len(population)-numKill]	#remove the ones we want to destroy
-
-			while not(childrenToMake == 1):	#keeps iterating until there is only one child to make
-				numChild = childrenToMake/2
-				childrenToMake -= numChild
-				for i in range(numChild):
-					self.crossover(population, population[i].getParameters(), population[iteration].getParameters())
-					
-				iteration += 1
-			self.crossover(population, population[0].getParameters(), population[1].getParameters())
+			if(self.crossoverType == 1):
+				self.crossover1(population)
+			elif(self.crossoverType == 2):
+				self.crossover2(population)
+			#else:
+			#	self.crossover3(population)
 	
 		return population
 
 
-	def run(self):
-		targetParameters = 	[
-								-86.6,  86,   0,		#lower x
-								-50,   -50, 100,		#lower y
-
-								-86.6,  86,   0,	    #upper x
-								-50,   -50, 100,		#upper y
-							]
+	def run(self, targetParameters):
 
 		startParameters = 	[
 								-85.6,  85,   1,	    #lower x
@@ -209,13 +257,67 @@ class GeneticOptimization( object ):
 			printer.setTravelDist(i)
 			targetEffectorPos.append( printer.getEffectorPosition()[2] )	#only get the z value
 
-		population = self.createPopulation(startParameters, 100)
+		population = self.createPopulation(startParameters, self.populationSize)
 
 		population = self.geneticSelection(population, targetEffectorPos, travelDist, printer)
 
 		#for i in population:
 		#	print i.getParameters()
 		
+		return population
+
+
+if (__name__ == "__main__"):
+	printer = PrinterModel.PrinterModel()
+	
+
+	targetParameters = 	[
+							-86.6,  86,   0,		#lower x
+							-50,   -50, 100,		#lower y
+
+							-86.6,  86,   0,	    #upper x
+							-50,   -50, 100,		#upper y
+						]
+
+	populationSize = [100, 1000, 10000]
+	numKillRatio = [10, 3, 2]  # = [10, 30, 50, 100, 300, 500, 1000, 3000, 5000]
+	mutationChance = [0.3, 0.5, 0.8]
+	mutationScale = [0.5,1,2]
+	numIterations = [100, 1000]#, 10000]
+	crossoverType = [1, 2]
+
+	f = open("log.txt", "w")
+
+
+	f.write("populationSize, numKillRatio, mutationChance, mutationScale, numIterations, crossoverType, realCost1, realCost2, realCost3, averageCost\n")
+
+	for p in populationSize:
+		for nKR in numKillRatio:
+			for mC in mutationChance:
+				for mS in mutationScale:
+					for nI in numIterations:
+						for cT in crossoverType:
+							f.write(str(p) +", "+ str(nKR) +", "+ str(mC) +", "+ str(mS) +", "+ str(nI) +", "+ str(cT) + ", ")
+							print (str(p) +", "+ str(nKR) +", "+ str(mC) +", "+ str(mS) +", "+ str(nI) +", "+ str(cT) + ", "),
+							ga = GeneticOptimization(p, (p/nKR), mC, mS, nI, cT)
+							averageCost = 0
+							for i in range(3):
+								realCost = 0
+								population = ga.run(targetParameters)
+								parameters = population[0].getParameters()
+								for i in range(len(parameters)):
+									realCost+=(parameters[i] - targetParameters[i])**2
+								realCost = math.sqrt(realCost)
+								averageCost+= realCost
+								f.write(str(realCost) + ", ")
+								print (str(realCost) + ", "),
+							f.write(str(averageCost) + "\n")
+							print (str(averageCost) + "\n"),
+	f.close()
+
+
+
+'''
 		print population[0].getParameters()
 
 		realCost = 0
@@ -224,8 +326,10 @@ class GeneticOptimization( object ):
 			realCost+=(parameters[i]-targetParameters[i])**2
 		print "realCost:", math.sqrt(realCost)
 
-if (__name__ == "__main__"):
-	printer = PrinterModel.PrinterModel()
-	ga = GeneticOptimization()
+
+
+
+	ga = GeneticOptimization(100, 30, 0.5, 1, 1000, 1)
 	for i in range(5):
-		ga.run()
+	 	ga.run()
+'''
