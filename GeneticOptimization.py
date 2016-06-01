@@ -278,18 +278,26 @@ if (__name__ == "__main__"):
 							-86.6,  86,   0,	    #upper x
 							-50,   -50, 100,		#upper y
 						]
-
-	populationSize = [100, 1000, 10000]
+	
+	populationSize = [100, 1000]#, 10000]
 	numKillRatio = [10, 3, 2]  # = [10, 30, 50, 100, 300, 500, 1000, 3000, 5000]
 	mutationChance = [0.3, 0.5, 0.8]
 	mutationScale = [0.5,1,2]
+	numIterations = [10]#[100, 1000]#, 10000]
+	crossoverType = [1, 2]
+	'''
+	populationSize = [1000]
+	numKillRatio = [2]  # = [10, 30, 50, 100, 300, 500, 1000, 3000, 5000]
+	mutationChance = [0.8]
+	mutationScale = [0.5,1,2]
 	numIterations = [100, 1000]#, 10000]
 	crossoverType = [1, 2]
-
+	#first attempt made it to here: 1000, 2, 0.8, 0.5, 1000, 1,	
+	'''	
 	f = open("log.txt", "w")
 
 
-	f.write("populationSize, numKillRatio, mutationChance, mutationScale, numIterations, crossoverType, realCost1, realCost2, realCost3, averageCost\n")
+	f.write("populationSize, numKillRatio, mutationChance, mutationScale, numIterations, crossoverType, realCost1, realCost2, realCost3, averageCost, runTime\n")
 
 	for p in populationSize:
 		for nKR in numKillRatio:
@@ -297,6 +305,7 @@ if (__name__ == "__main__"):
 				for mS in mutationScale:
 					for nI in numIterations:
 						for cT in crossoverType:
+							start = time.clock()
 							f.write(str(p) +", "+ str(nKR) +", "+ str(mC) +", "+ str(mS) +", "+ str(nI) +", "+ str(cT) + ", ")
 							print (str(p) +", "+ str(nKR) +", "+ str(mC) +", "+ str(mS) +", "+ str(nI) +", "+ str(cT) + ", "),
 							ga = GeneticOptimization(p, (p/nKR), mC, mS, nI, cT)
@@ -311,8 +320,12 @@ if (__name__ == "__main__"):
 								averageCost+= realCost
 								f.write(str(realCost) + ", ")
 								print (str(realCost) + ", "),
-							f.write(str(averageCost) + "\n")
-							print (str(averageCost) + "\n"),
+							averageCost = averageCost/3
+							f.write(str(averageCost) + ", ")
+							print (str(averageCost) + ", "),
+							end = time.clock()
+							f.write(str((end-start)/3)+"\n")
+							print (str((end-start)/3)+"\n"),
 	f.close()
 
 
