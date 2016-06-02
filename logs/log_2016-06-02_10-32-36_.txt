@@ -1,2 +1,2 @@
 populationSize, numKillRatio, mutationChance, mutationScale, numIterations, crossoverType, realCost1, realCost2, realCost3, averageCost, runTime
-100, 2, 0.3, 0.5, 10, 1, 3.36883521463, 3.48384387088, 3.3352173523, 3.39596547927, 0.315656
+100, 2, 0.3, 0.5, 10, 1, 
