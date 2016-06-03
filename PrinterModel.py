@@ -2,8 +2,8 @@ import time
 import datetime
 import random
 import math
-#import kinematics_py as kinematics
-import kinematics_c as kinematics
+import kinematics_py as kinematics
+#import kinematics_c as kinematics
 
 class PrinterModel:
 	#for calculating the kinematics	
