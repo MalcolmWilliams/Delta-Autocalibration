@@ -63,8 +63,10 @@ class GeneticOptimization( object ):
 		self.targetEffectorPos = []
 		#self.population = []
 		
+		self.results = []
+				
 		startParameters = 	[
-								-76.6,  86,   0,		#lower x
+								-66.6,  86,   0,		#lower x
 								-50,   -50, 100,		#lower y
 
 								-86.6,  86,   0,	    #upper x
@@ -154,7 +156,7 @@ class GeneticOptimization( object ):
 		self.updateCosts()
 		
 		self.population = sorted(self.population, key=lambda individual: individual.cost)
-		print str(self.population[0].getCost()) + " "
+		return self.population[0].getCost()
 
 		iteration = 0
 		childrenToMake = self.numKill 	#we want the population to remain at a constant size
@@ -191,10 +193,11 @@ class GeneticOptimization( object ):
 			#possible issue zeroing in on solution since all have a chance to mutate.
 			
 			
-			print i,
+			
+			
 			#self.crossover()
-			self.crossoverAll()
-		
+			lowestCost = self.crossoverAll()
+			self.results.append([i, lowestCost])
 	
 	def run(self, targetParameters):
 		#the set of carriage locations to generate the test points
@@ -246,7 +249,7 @@ class GeneticOptimization( object ):
 		self.geneticSelection()
 
 
-		return sorted(self.population, key=lambda individual: individual.cost)
+		return sorted(self.population, key=lambda individual: individual.cost), self.results
 
 
 if (__name__ == "__main__"):
@@ -268,18 +271,16 @@ if (__name__ == "__main__"):
 	numIterations = [10]#[100, 1000]#, 10000]
 	crossoverType = [1, 2]
 	'''
-	populationSize = [100]
-	numKillRatio = [2]  # = [10, 30, 50, 100, 300, 500, 1000, 3000, 5000]
+	populationSize = [10000]
+	numKillRatio = [10]  # = [10, 30, 50, 100, 300, 500, 1000, 3000, 5000]
 	mutationChance = [0.1]
 	mutationScale = [0.5]
-	numIterations = [10000]#, 10000]
+	numIterations = [100]#, 10000]
 	crossoverType = [1]
-	'''	
-	ts = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-	f = open("logs/log_" +str(ts)+ "_.txt", "w")
+		
+	
 
-
-	f.write("populationSize, numKillRatio, mutationChance, mutationScale, numIterations, crossoverType, realCost1, realCost2, realCost3, averageCost, runTime\n")
+	#f.write("populationSize, numKillRatio, mutationChance, mutationScale, numIterations, crossoverType, realCost1, realCost2, realCost3, averageCost, runTime\n")
 
 	for p in populationSize:
 		for nKR in numKillRatio:
@@ -287,6 +288,21 @@ if (__name__ == "__main__"):
 				for mS in mutationScale:
 					for nI in numIterations:
 						for cT in crossoverType:
+							ts = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+							f = open("logs/log_" +str(ts) +"_"+ str(p) +"_"+ str(nKR) +"_"+ str(mC) +"_"+ str(mS) +"_"+ str(nI) +"_"+ str(cT) +"_.txt", "w")
+							
+							ga = GeneticOptimization(p, p/nKR, mC, mS, nI, cT)
+							finalPopulation, results = ga.run(targetParameters)	
+
+							for i in range (len(results)):
+								f.write(str(results[i][0]))
+								f.write("\t")
+								f.write(str(results[i][1]))
+								f.write("\n")
+							
+							f.close()
+
+							'''
 							start = time.clock()
 							f.write(str(p) +", "+ str(nKR) +", "+ str(mC) +", "+ str(mS) +", "+ str(nI) +", "+ str(cT) + ", ")
 							print (str(p) +", "+ str(nKR) +", "+ str(mC) +", "+ str(mS) +", "+ str(nI) +", "+ str(cT) + ", "),
@@ -311,6 +327,35 @@ if (__name__ == "__main__"):
 							print (str((end-start)/3)+"\n"),
 	f.close()
 	'''
-	ga = GeneticOptimization(100, 2, 0.1, 0.5, 1000, 1)
-	ga.run(targetParameters)	
+	'''
+	ts = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+	print ts
+	print populationSize
+	print numKillRatio
+	print mutationChance
+	print mutationScale
+	print numIterations
+	print crossoverType 
 
+
+	f.write( ts )
+	f.write( populationSize )
+	f.write( numKillRatio )
+	f.write( mutationChance )
+	f.write( mutationScale )
+	f.write( numIterations )
+	f.write( crossoverType )
+	'''
+	'''
+	i = 0
+	ga = GeneticOptimization(populationSize[i], populationSize[i]/numKillRatio[i], mutationChance[i], mutationScale[i], numIterations[i], crossoverType[i])
+	finalPopulation, results = ga.run(targetParameters)	
+
+	for i in range (len(results)):
+		f.write(str(results[i][0]))
+		f.write("\t")
+		f.write(str(results[i][1]))
+		f.write("\n")
+	
+	f.close()
+	'''
