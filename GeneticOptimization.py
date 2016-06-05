@@ -64,20 +64,13 @@ class GeneticOptimization( object ):
 		#self.population = []
 		
 		startParameters = 	[
-								-85.6,  86,   0,		#lower x
+								-76.6,  86,   0,		#lower x
 								-50,   -50, 100,		#lower y
 
 								-86.6,  86,   0,	    #upper x
 								-50,   -50, 100,		#upper y
 							]
-		'''startParameters = 	[
-								-85.6,  85,   1,	    #lower x
-								-51,   -51, 99,		#lower y
-
-								-85.6,  85,   1,	    #upper x
-								-51,   -51, 101,		#upper y
-							]
-		'''
+		
 		self.population = []
 		self.createPopulation(startParameters, self.populationSize)
 
@@ -114,7 +107,7 @@ class GeneticOptimization( object ):
 			self.printer.setTravelDist(self.travelDist[j])
 			indiv.setEffectorPos(self.printer.getEffectorPosition())
 			cost += (indiv.getEffectorPos()[2] - self.targetEffectorPos[j])**2
-		print str(cost) + " " 
+		#print str(cost) + " " 
 		indiv.setCost(cost)
 
 	def makeChild(self, parameters1, parameters2, idx):
@@ -141,8 +134,6 @@ class GeneticOptimization( object ):
 		#population.remove(population[rand[0][2]])
 		self.makeChild( self.population[rand[0][0]].getParameters(), self.population[rand[1][0]].getParameters(), rand[2][0])
 		#have a chance of mutating the child
-
-
 
 	#crossover of all population
 	def crossoverAverage(self, parameters1, parameters2):
@@ -178,12 +169,6 @@ class GeneticOptimization( object ):
 			iteration += 1
 		self.crossoverAverage(self.population[0].getParameters(), self.population[1].getParameters())
 
-
-
-
-
-
-
 	def mutateIndiv(self, indiv, scaleFactor):
 		parameters = self.mutate(indiv.getParameters(),scaleFactor)
 		indiv.setParameters(parameters)
@@ -193,8 +178,6 @@ class GeneticOptimization( object ):
 		randomVal = random.random() * scaleFactor - 0.5 * scaleFactor
 		parameters[randomInt] = parameters[randomInt] + randomVal
 		return parameters
-
-
 
 	def geneticSelection(self):
 		for i in range(self.numIterations):
@@ -214,8 +197,6 @@ class GeneticOptimization( object ):
 		
 	
 	def run(self, targetParameters):
-
-
 		#the set of carriage locations to generate the test points
 		self.travelDist = [
 			[49.999, 50, 50],

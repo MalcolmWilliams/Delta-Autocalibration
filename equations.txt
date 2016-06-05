@@ -1,7 +1,7 @@
 "alpha_arm"=122
 "beta_arm"=120
 "gamma_arm"=120
-"alpha_x_bot"=86.66
+"alpha_x_bot"=86.6
 "beta_x_bot"=86
 "gamma_x_bot"=0
 "alpha_y_bot"=50
@@ -13,7 +13,7 @@
 "alpha_y_top"=50
 "beta_y_top"=50
 "gamma_y_top"=100
-"alpha_carriage_travel"=5
-"beta_carriage_travel"=50
-"gamma_carriage_travel"=50
+"alpha_carriage_travel"=10
+"beta_carriage_travel"=20
+"gamma_carriage_travel"=30
 "tower_height"=120

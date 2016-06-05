@@ -2,23 +2,14 @@ import time
 import datetime
 import random
 import math
-import kinematics_py as kinematics
-#import kinematics_c as kinematics
+#import kinematics_py as kinematics
+import kinematics_c as kinematics
 
 class PrinterModel:
 	#for calculating the kinematics	
 	#the tower orders are alpha, beta, gamma
 
 	arms = [122,120,120]
-
-	#locationsof the carriages, updated by method updateCarriagePosition
-	'''
-	carriagePos = [
-	[0,1,0],		#x
-	[0,0,1],		#y
-	[0,0,0],		#z	
-	]		
-	'''	
 
 	travelDist = [5,50,50]
 
@@ -45,12 +36,6 @@ class PrinterModel:
 		self.towerVertices[4][:] = parameters[9:12]
 		#print parameters
 
-		
-	def setRandDist(self, idx,val):
-		self.travelDist[1] = 1
-		return self.travelDist
-
-
 	def getEffectorPosition(self):
 		#see notebook for better explanation.
 		#datastructures needed: arms, carriagePos
@@ -59,10 +44,6 @@ class PrinterModel:
 
 		effectPos = kinematics.getEffectorPos(self.towerVertices, self.travelDist, self.arms)
 		return effectPos
-
-
-
-
 
 	def exportVars(self):
 		"""Write the printer parameters to a textfile for importing into solidworks"""
@@ -109,3 +90,19 @@ class PrinterModel:
 			f.write("\n")
 		f.close()
 
+if(__name__ == "__main__"):
+	startParameters = 	[
+						-86.6,  86,   0,		#lower x
+						-50,   -50, 100,		#lower y
+
+						-86.6,  86,   0,	    #upper x
+						-50,   -50, 100,		#upper y
+					]
+	travelDist = [10,20,30]
+
+	printer = PrinterModel()
+	printer.setParameters(startParameters)
+	printer.setTravelDist(travelDist)
+
+	print printer.getEffectorPosition()
+	printer.exportVars()
