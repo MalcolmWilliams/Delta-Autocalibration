@@ -197,7 +197,8 @@ class GeneticOptimization( object ):
 			
 			#self.crossover()
 			lowestCost = self.crossoverAll()
-			self.results.append([i, lowestCost])
+			#self.results.append([i, lowestCost])
+			self.results.append([ lowestCost ])
 	
 	def run(self, targetParameters):
 		#the set of carriage locations to generate the test points
@@ -271,11 +272,11 @@ if (__name__ == "__main__"):
 	numIterations = [10]#[100, 1000]#, 10000]
 	crossoverType = [1, 2]
 	'''
-	populationSize = [10000]
-	numKillRatio = [10]  # = [10, 30, 50, 100, 300, 500, 1000, 3000, 5000]
+	populationSize = [10, 100, 1000]
+	numKillRatio = [10,5,2]  # = [10, 30, 50, 100, 300, 500, 1000, 3000, 5000]
 	mutationChance = [0.1]
 	mutationScale = [0.5]
-	numIterations = [100]#, 10000]
+	numIterations = [1000,10000]#[100, 1000, 10000]#, 10000]
 	crossoverType = [1]
 		
 	
@@ -290,14 +291,16 @@ if (__name__ == "__main__"):
 						for cT in crossoverType:
 							ts = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 							f = open("logs/log_" +str(ts) +"_"+ str(p) +"_"+ str(nKR) +"_"+ str(mC) +"_"+ str(mS) +"_"+ str(nI) +"_"+ str(cT) +"_.txt", "w")
-							
+						
+							f.write(str(ts) +"\n"+ str(p) +"\n"+ str(nKR) +"\n"+ str(mC) +"\n"+ str(mS) +"\n"+ str(nI) +"\n"+ str(cT) +"\n")
+	
 							ga = GeneticOptimization(p, p/nKR, mC, mS, nI, cT)
 							finalPopulation, results = ga.run(targetParameters)	
 
 							for i in range (len(results)):
 								f.write(str(results[i][0]))
-								f.write("\t")
-								f.write(str(results[i][1]))
+								#f.write("\t")
+								#f.write(str(results[i][1]))
 								f.write("\n")
 							
 							f.close()
